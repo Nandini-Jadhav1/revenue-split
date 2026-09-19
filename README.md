@@ -22,11 +22,11 @@ Midnight Preprod
 
 GitHub Repository
 
-https://github.com/Nandini-Jadhav1/level-6
+https://github.com/Nandini-Jadhav1/revenue-split
 
 Live Production Demo
 
-https://level-6-zeta.vercel.app/
+https://revenue-split-nu.vercel.app
 
 Demo Video
 
@@ -60,7 +60,7 @@ Contract Address
 
 Midnight Preprod
 
-02005a9c0897f1da76135dd6977be415f3cf374466986b24d77eb60cbe4eeef45a8e
+⏳ Pending deployment — contract will be deployed to Preprod in step 2
 
 The contract source is defined in:
 
@@ -734,8 +734,8 @@ Docker if the local proof-server workflow is required
 
 2. Clone Repository
 
-git clone https://github.com/Nandini-Jadhav1/level-6.git
-cd level-6
+git clone https://github.com/Nandini-Jadhav1/revenue-split.git
+cd revenue-split
 
 3. Install Dependencies
 
@@ -831,7 +831,7 @@ Vercel production deployment is updated when changes are pushed to the configure
 
 Production URL
 
-https://level-6-zeta.vercel.app/
+https://revenue-split-nu.vercel.app
 
 The Vercel dashboard confirms the deployment is:
 
@@ -1012,14 +1012,14 @@ npm run fetch-users
 
 **How It Works:**
 1. Queries Midnight Preprod indexer GraphQL API
-2. Fetches all transactions involving contract `02005a9c0897f1da76135dd6977be415f3cf374466986b24d77eb60cbe4eeef45a8e`
+2. Fetches all transactions involving the deployed contract (address pending deployment)
 3. Extracts unique wallet addresses from transaction history
 4. Displays count and verification status against 70-user requirement
 
 **Sample Output:**
 ```
 🔍 Fetching Preprod user wallet addresses...
-📝 Contract: 02005a9c0897f1da76135dd6977be415f3cf374466986b24d77eb60cbe4eeef45a8e
+📝 Contract: [will be populated after deployment]
 🌐 Indexer: https://indexer.preprod.midnight.network/api/v4/graphql
 
 ✅ Found 85 unique wallet addresses:
@@ -1131,7 +1131,7 @@ Vercel Deployment
 
 ✅
 
-level-6-zeta.vercel.app
+revenue-split-nu.vercel.app
 
 Demo Video
 
@@ -1143,7 +1143,7 @@ GitHub Repository
 
 ✅
 
-Nandini-Jadhav1/level-6
+Nandini-Jadhav1/revenue-split
 
 🏆 Level 6 Submission Evidence
 
@@ -1153,11 +1153,11 @@ Link / Location
 
 GitHub
 
-https://github.com/Nandini-Jadhav1/level-6
+https://github.com/Nandini-Jadhav1/revenue-split
 
 Live Demo
 
-https://level-6-zeta.vercel.app/
+https://revenue-split-nu.vercel.app
 
 Demo Video
 
