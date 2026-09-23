@@ -1,121 +1,121 @@
-🔐 Private Revenue Split — Level 6 Supermoon Edition
+# 🔐 Private Revenue Split — Level 6 Supermoon Edition
+
+[![CI](https://github.com/Nandini-Jadhav1/revenue-split/actions/workflows/ci.yml/badge.svg)](https://github.com/Nandini-Jadhav1/revenue-split/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-green.svg)](https://nodejs.org/)
+[![Midnight Network](https://img.shields.io/badge/Network-Midnight%20Preprod-blueviolet.svg)](https://midnight.network/)
 
 Privacy-preserving revenue distribution powered by Midnight Network, Compact smart contracts, zero-knowledge proofs, and 1AM Wallet.
 
-Private Revenue Split is a Midnight Preprod decentralized application that allows a revenue pool to be distributed among multiple recipients while keeping individual recipient payout values confidential.
+Private Revenue Split is a Midnight Preprod decentralized application that allows a revenue pool to be distributed among multiple recipients while keeping individual recipient payout values confidential. The application combines a Midnight Compact smart contract, zero-knowledge proof verification, private witnesses, commitment-based recipient registration, and 1AM Wallet transaction authorization.
 
-The application combines a Midnight Compact smart contract, zero-knowledge proof verification, private witnesses, commitment-based recipient registration, and 1AM Wallet transaction authorization.
+---
 
-🌕 Quick Links & Level 6 Supermoon Submission Status
+## 📋 Table of Contents
 
-Resource
+- [Quick Links & Submission Status](#-quick-links--level-6-supermoon-submission-status)
+- [Midnight Preprod Contract](#-midnight-preprod-contract)
+- [Demo](#-demo)
+- [Problem Statement](#-problem-statement)
+- [The Private Revenue Split Solution](#-the-private-revenue-split-solution)
+- [Core Features](#-core-features)
+- [Level 6 Product Improvements](#-level-6-product-improvements)
+- [Complete User Journey](#-complete-user-journey)
+- [Architecture](#-architecture)
+- [Component Responsibilities](#-component-responsibilities)
+- [Privacy Model](#-privacy-model)
+- [Revenue Split Logic](#-revenue-split-logic)
+- [Access Control & Double Claim Protection](#-access-control--double-claim-protection)
+- [Midnight Preprod](#-midnight-preprod)
+- [1AM Wallet Integration](#-1am-wallet-integration)
+- [Technology Stack](#-technology-stack)
+- [Project Structure](#-project-structure)
+- [Local Setup & Development](#-local-setup--development)
+- [Testing, Linting & Verification](#-testing-linting--verification)
+- [Production Build](#-production-build)
+- [CI/CD](#-cicd)
+- [Vercel Deployment](#️-vercel-deployment)
+- [User Feedback System](#-user-feedback-system)
+- [Feedback-Driven Improvements](#-feedback-driven-improvements)
+- [Transaction Notification Specification](#-transaction-notification-specification)
+- [Manual End-to-End Verification](#-manual-end-to-end-verification)
+- [Known Limitations](#️-known-limitations)
+- [Security Notes](#-security-notes)
+- [Preprod Users Verification](#-preprod-users-verification)
+- [Level 6 Verification Status](#-level-6-verification-status)
+- [Level 6 Submission Evidence](#-level-6-submission-evidence)
+- [Project Status](#-project-status)
+- [Future Roadmap](#-future-roadmap)
+- [Documentation Index](#-documentation-index)
+- [License](#-license)
+- [Acknowledgements](#-acknowledgements)
 
-Value / Link
+---
 
-Level 6 Supermoon Status
+## 🌕 Quick Links & Level 6 Supermoon Submission Status
 
-🌕 Active Submission
+| Resource | Value / Link |
+|---|---|
+| Level 6 Supermoon Status | 🌕 Active Submission |
+| Midnight Network | Midnight Preprod |
+| GitHub Repository | https://github.com/Nandini-Jadhav1/revenue-split |
+| Live Production Demo | https://revenue-split-nu.vercel.app |
+| Demo Video | https://youtu.be/yyFmQHbjRrc |
+| X / Project Profile | https://x.com/jadhav_nan99910 |
+| Google Feedback Form | https://docs.google.com/forms/d/1rhrEcQg1HiFBwoY59cFKXp5K8nU4WeMpskPLNH6Edrk/viewform |
+| Google Feedback Responses | https://docs.google.com/spreadsheets/d/1vW6SEV52-JAy9A4Y3DYNu8F8dijMZnh64fwbAbs9s/edit?gid=2082627229 |
+| Feedback Documentation | docs/FEEDBACK.md |
+| User Documentation | docs/USAGE.md |
 
-Midnight Network
+---
 
-Midnight Preprod
+## 📜 Midnight Preprod Contract
 
-GitHub Repository
+| Network | Contract Address |
+|---|---|
+| Midnight Preprod | ⏳ Pending deployment — contract will be deployed to Preprod in step 2 |
 
-https://github.com/Nandini-Jadhav1/revenue-split
+The contract source is defined in `contracts/revenue-split.compact` and implements the privacy-preserving revenue split logic used by the application.
 
-Live Production Demo
+---
 
-https://revenue-split-nu.vercel.app
+## 🎥 Demo
 
-Demo Video
-
-https://youtu.be/yyFmQHbjRrc
-
-X / Project Profile
-
-https://x.com/jadhav_nan99910
-
-Google Feedback Form
-
-https://docs.google.com/forms/d/1rhrEcQg1HiFBwoY59cFKXp5K8nU4WeMpskPLNH6Edrk/viewform
-
-Google Feedback Responses
-
-https://docs.google.com/spreadsheets/d/1vW6SEV52-JAy9A4Y3DYNu8F8dijMZnh64fwbAbs9s/edit?gid=2082627229
-
-Feedback Documentation
-
-docs/FEEDBACK.md
-
-User Documentation
-
-docs/USAGE.md
-
-📜 Midnight Preprod Contract
-
-Network
-
-Contract Address
-
-Midnight Preprod
-
-⏳ Pending deployment — contract will be deployed to Preprod in step 2
-
-The contract source is defined in:
-
-contracts/revenue-split.compact
-
-The contract implements the privacy-preserving revenue split logic used by the application.
-
-🎥 Demo
-
-▶️ Watch the Private Revenue Split MVP Demo
-
-https://youtu.be/yyFmQHbjRrc
+**[▶️ Watch the Private Revenue Split MVP Demo](https://youtu.be/yyFmQHbjRrc)**
 
 The demonstration covers the application interface, 1AM Wallet connection, private revenue split workflow, recipient claim flow, and Midnight Preprod interaction.
 
-❓ Problem Statement
+---
 
-Traditional revenue-split systems expose sensitive financial information.
+## ❓ Problem Statement
 
-On transparent public blockchains, a revenue distribution can reveal:
+Traditional revenue-split systems expose sensitive financial information. On transparent public blockchains, a revenue distribution can reveal:
 
-Recipient addresses
-
-Individual payout amounts
-
-Revenue percentages
-
-Transaction relationships
-
-Payment history
-
-Business or contributor compensation patterns
+- Recipient addresses
+- Individual payout amounts
+- Revenue percentages
+- Transaction relationships
+- Payment history
+- Business or contributor compensation patterns
 
 This creates privacy problems for:
 
-Businesses negotiating private revenue agreements
-
-Co-founders sharing revenue
-
-Freelancers and contributors receiving private compensation
-
-DAO or project contributors
-
-Private partnership arrangements
-
-Confidential payment distributions
+- Businesses negotiating private revenue agreements
+- Co-founders sharing revenue
+- Freelancers and contributors receiving private compensation
+- DAO or project contributors
+- Private partnership arrangements
+- Confidential payment distributions
 
 A participant should be able to verify and claim their own share without automatically exposing the exact share of every other participant.
 
-💡 The Private Revenue Split Solution
+---
 
-Private Revenue Split uses Midnight Network's privacy-preserving architecture to create confidential revenue distribution.
+## 💡 The Private Revenue Split Solution
 
-The application separates public blockchain verification from private financial information.
+Private Revenue Split uses Midnight Network's privacy-preserving architecture to create confidential revenue distribution. The application separates public blockchain verification from private financial information.
 
+```text
 Private Recipient Data
         │
         ▼
@@ -129,91 +129,79 @@ Midnight Compact Contract
         │
         ▼
 Verified Private Claim
+```
 
 The contract verifies the required conditions while individual recipient payout information remains private to the party that needs it.
 
-✨ Core Features
+---
 
-🔐 Confidential Payouts
+## ✨ Core Features
+
+### 🔐 Confidential Payouts
 
 Individual recipient shares are handled as private witness information instead of being exposed as ordinary public payout data.
 
-🧮 Zero-Knowledge Verification
+### 🧮 Zero-Knowledge Verification
 
 The Compact circuit verifies the revenue-split constraints without requiring every individual payout value to be publicly revealed.
 
-🛡️ Double-Claim Protection
+### 🛡️ Double-Claim Protection
 
 Cryptographic claim/nullifier state prevents a recipient from successfully claiming the same private share more than once.
 
-👛 1AM Wallet Integration
+### 👛 1AM Wallet Integration
 
 The application connects to the Midnight DApp Connector API through the 1AM Wallet:
 
+```javascript
 window.midnight["1am"]
+```
 
 The wallet is used for account connection and transaction authorization on Midnight Preprod.
 
-🔒 Commitment-Based Registration
+### 🔒 Commitment-Based Registration
 
-Recipient information can be represented by a commitment derived from private values.
+Recipient information can be represented by a commitment derived from private values:
 
-Conceptually:
-
+```text
 commitment = hash(secret, salt, amount)
+```
 
 The commitment can be registered while the underlying private values remain outside the public ledger representation.
 
-📊 Live Ledger State
+### 📊 Live Ledger State
 
 The application dashboard displays high-level protocol information such as:
 
-Total paid in
-
-Total split out
-
-Number of commitments
-
-Number of executed claims
-
-Contract status
-
-Network state
+- Total paid in
+- Total split out
+- Number of commitments
+- Number of executed claims
+- Contract status
+- Network state
 
 The individual private recipient values are not displayed as public ledger data.
 
-🧾 Transaction Success Notifications
+### 🧾 Transaction Success Notifications
 
-Successful register and claim operations now display a dedicated transaction-success notification.
+Successful register and claim operations display a dedicated transaction-success notification including:
 
-The notification includes:
-
-Transaction Successful
-
-Operation-specific confirmation message
-
-Truncated transaction ID
-
-Manual close button
-
-Automatic dismissal after 8 seconds
+- Operation-specific confirmation message
+- Truncated transaction ID
+- Manual close button
+- Automatic dismissal after 8 seconds
 
 The success notification is triggered only after the transaction call succeeds.
 
-🧑‍💻 Level 6 Product Improvements
+---
 
-The Level 6 iteration incorporated direct user feedback collected through the project feedback workflow.
-
-1. ⚡ Transaction Successful Message
-
-Implemented a dedicated success state:
+## 🧑‍💻 Level 6 Product Improvements
 
 The Level 6 iteration incorporated direct user feedback collected through the project feedback workflow.
 
 ### 1. 🔧 Critical Bug Fix: Wallet Connection State
 
-**Issue Identified:**
-Users reported that the wallet displayed as "connected" in the header, but clicking "Claim Private Payout" showed "Wallet not connected" error.
+**Issue Identified:** Users reported that the wallet displayed as "connected" in the header, but clicking "Claim Private Payout" showed "Wallet not connected" error.
 
 **Root Cause:**
 - `WalletConnect.tsx` and `RevenueSplit.tsx` each used separate `useMidnight()` hook instances
@@ -230,7 +218,7 @@ Users reported that the wallet displayed as "connected" in the header, but click
 **Impact:**
 - ✅ Single source of truth for wallet connection
 - ✅ No more "Wallet not connected" errors after successful connection
-- ✅ Improved user experience - connect once, use everywhere
+- ✅ Improved user experience — connect once, use everywhere
 - ✅ Eliminated redundant wallet authorization prompts
 
 **Files Modified:**
@@ -241,26 +229,31 @@ Users reported that the wallet displayed as "connected" in the header, but click
 
 **Commit:** `9ff8c00`
 
+---
+
 ### 2. ⚡ Transaction Successful Message
 
-After a successful claim transaction:
+After a successful **claim** transaction:
 
+```text
 Transaction Successful
 
 Your private claim was successfully submitted
 on Midnight Preprod
+```
 
-Register Success
+After a successful **registration** transaction:
 
-After a successful registration transaction:
-
+```text
 Transaction Successful
 
 Recipient commitment was successfully registered
 on Midnight Preprod
+```
 
-Success Toast Behavior
+**Success Toast Behavior:**
 
+```text
 Transaction submitted
         │
         ▼
@@ -276,78 +269,45 @@ Success notification
         ├── Confirmation message
         ├── Manual close
         └── Auto-dismiss after 8 seconds
+```
 
 Errors do not trigger the success notification.
+
+---
 
 ### 3. 🎨 UI Improvements
 
 The Level 6 UI was refined based on user feedback.
 
-Clearer Action Labels
+**Clearer Action Labels:**
 
-Previous Label
+| Previous Label | Updated Label |
+|---|---|
+| Prove & Claim Payout Confidentiality | Claim Private Payout |
+| Commit Recipient Cut On-Chain | Register Split Rule |
+| Generating Zero-Knowledge Proof… | Generating ZK Proof… |
+| Registering Commitment… | Registering Rule… |
 
-Updated Label
+**Enhanced Buttons:**
 
-Prove & Claim Payout Confidentiality
+The main transaction buttons were improved with increased button height, gradient backgrounds, stronger hover states, keyboard focus rings, better disabled states, improved shadows, and subtle interaction feedback.
 
-Claim Private Payout
+**Demo Credential Panel:**
 
-Commit Recipient Cut On-Chain
+The Alice/Bob demonstration area was redesigned with separate recipient cards, clearer visual hierarchy, percentage indicators, better borders and backgrounds, larger interaction areas, and improved hover states.
 
-Register Split Rule
-
-Generating Zero-Knowledge Proof…
-
-Generating ZK Proof…
-
-Registering Commitment…
-
-Registering Rule…
-
-Enhanced Buttons
-
-The main transaction buttons were improved with:
-
-Increased button height
-
-Gradient backgrounds
-
-Stronger hover states
-
-Keyboard focus rings
-
-Better disabled states
-
-Improved shadows
-
-Subtle interaction feedback
-
-Demo Credential Panel
-
-The Alice/Bob demonstration area was redesigned with:
-
-Separate recipient cards
-
-Clearer visual hierarchy
-
-Percentage indicators
-
-Better borders and backgrounds
-
-Larger interaction areas
-
-Improved hover states
-
-Example:
-
+```text
 Alice — 700 tDUST (70%)
 Bob   — 300 tDUST (30%)
+```
 
 These values are demonstration credentials and are not production secrets.
 
-🗺️ Complete User Journey
+---
 
+## 🗺️ Complete User Journey
+
+```text
 1. Open Private Revenue Split
         ↓
 2. Connect 1AM Wallet
@@ -375,9 +335,13 @@ These values are demonstration credentials and are not production secrets.
 13. Claim is verified
         ↓
 14. Transaction Successful notification
+```
 
-🏗️ Architecture
+---
 
+## 🏗️ Architecture
+
+```text
                          ┌──────────────────────┐
                          │       User           │
                          └──────────┬───────────┘
@@ -415,113 +379,50 @@ These values are demonstration credentials and are not production secrets.
                   │ Compact Contract │
                   │ RevenueSplit     │
                   └──────────────────┘
+```
 
-🧩 Component Responsibilities
+---
 
-Component
+## 🧩 Component Responsibilities
 
-Responsibility
+| Component | Responsibility |
+|---|---|
+| React Frontend | Application UI and user workflow |
+| RevenueSplit.tsx | Register and claim interface |
+| useMidnight.ts | Midnight / wallet connection and transaction interaction |
+| 1AM Wallet | Wallet identity and transaction authorization |
+| Compact Contract | Revenue-split verification logic |
+| Managed Contract Artifacts | Generated TypeScript / ZK contract interfaces |
+| Vitest | Automated contract and workflow tests |
+| Vercel | Production hosting |
+| GitHub Actions | CI/CD validation |
 
-React Frontend
+---
 
-Application UI and user workflow
-
-RevenueSplit.tsx
-
-Register and claim interface
-
-useMidnight.ts
-
-Midnight / wallet connection and transaction interaction
-
-1AM Wallet
-
-Wallet identity and transaction authorization
-
-Compact Contract
-
-Revenue-split verification logic
-
-Managed Contract Artifacts
-
-Generated TypeScript / ZK contract interfaces
-
-Vitest
-
-Automated contract and workflow tests
-
-Vercel
-
-Production hosting
-
-GitHub Actions
-
-CI/CD validation
-
-🔒 Privacy Model
+## 🔒 Privacy Model
 
 Private Revenue Split is designed around a separation between public verification state and private recipient information.
 
-Data Element
-
-Application Handling
-
-Intended Privacy
-
-Recipient private secret
-
-Private witness
-
-Not publicly exposed
-
-Recipient salt
-
-Private witness
-
-Not publicly exposed
-
-Individual payout amount
-
-Private claim data
-
-Not publicly exposed
-
-Commitment
-
-On-chain
-
-Public commitment
-
-Claim/nullifier state
-
-Contract state
-
-Used to prevent double claims
-
-Transaction ID
-
-Transaction result
-
-Public blockchain transaction metadata
-
-Wallet address
-
-1AM Wallet
-
-Blockchain identity
-
-Contract address
-
-Midnight Preprod
-
-Public
+| Data Element | Application Handling | Intended Privacy |
+|---|---|---|
+| Recipient private secret | Private witness | Not publicly exposed |
+| Recipient salt | Private witness | Not publicly exposed |
+| Individual payout amount | Private claim data | Not publicly exposed |
+| Commitment | On-chain | Public commitment |
+| Claim/nullifier state | Contract state | Used to prevent double claims |
+| Transaction ID | Transaction result | Public blockchain transaction metadata |
+| Wallet address | 1AM Wallet | Blockchain identity |
+| Contract address | Midnight Preprod | Public |
 
 The application does not treat the public blockchain as a place to publish every participant's private payout value.
 
-🧮 Revenue Split Logic
+---
 
-A simplified conceptual model is:
+## 🧮 Revenue Split Logic
 
+A simplified conceptual model:
+
+```text
 Total Paid In
       │
       ├───────────────┐
@@ -536,15 +437,17 @@ Private Share     Private Share
               │
               ▼
       Valid Private Claim
+```
 
 The contract/test suite verifies that invalid split conditions are rejected and valid private claims can be processed.
 
-🛡️ Access Control & Double Claim Protection
+---
 
-The application includes privacy and access-control checks.
+## 🛡️ Access Control & Double Claim Protection
 
-The automated tests verify:
+The application includes privacy and access-control checks. The automated tests verify:
 
+```text
 Recipient A
     │
     ├── Can claim A's valid private share     ✅
@@ -552,26 +455,32 @@ Recipient A
     ├── Cannot claim B's private share        ✅
     │
     └── Cannot successfully claim twice       ✅
+```
 
 This ensures that a private witness for one recipient cannot simply be reused as another recipient's valid claim.
 
-🌐 Midnight Preprod
+---
+
+## 🌐 Midnight Preprod
 
 This project targets:
 
-Network: Midnight Preprod
+```text
+Network:   Midnight Preprod
 Network ID: preprod
-Wallet: 1AM Wallet
+Wallet:    1AM Wallet
 DApp Connector: window.midnight["1am"]
+```
 
 The production demo shown in the project evidence is deployed through Vercel and configured for the Midnight Preprod workflow.
 
-👛 1AM Wallet Integration
+---
+
+## 👛 1AM Wallet Integration
 
 The wallet integration uses the Midnight DApp Connector rather than an EVM wallet architecture.
 
-Conceptually:
-
+```text
 Browser
    │
    ▼
@@ -585,85 +494,45 @@ Private Revenue Split
    │
    ▼
 Midnight Preprod
+```
 
 This project does not depend on:
 
-MetaMask
-Ethereum
-Solidity
-ethers.js
-WalletConnect
+- MetaMask
+- Ethereum
+- Solidity
+- ethers.js
+- WalletConnect
 
 The intended wallet flow is Midnight + 1AM Wallet.
 
-📦 Technology Stack
+---
 
-Layer
+## 📦 Technology Stack
 
-Technology
+| Layer | Technology |
+|---|---|
+| Frontend | React |
+| Language | TypeScript |
+| Build Tool | Vite |
+| Styling | Tailwind CSS |
+| Icons | Lucide React |
+| Smart Contract | Midnight Compact |
+| Blockchain | Midnight Preprod |
+| Wallet | 1AM Wallet |
+| Connector | Midnight DApp Connector API |
+| ZK Testing | Midnight Compact / testkit tooling |
+| Testing | Vitest 2.1.9 |
+| Runtime | Node.js 22+ |
+| Deployment | Vercel |
+| CI/CD | GitHub Actions |
+| Repository | GitHub |
 
-Frontend
+---
 
-React
+## 📁 Project Structure
 
-Language
-
-TypeScript
-
-Build Tool
-
-Vite
-
-Styling
-
-Tailwind CSS
-
-Icons
-
-Lucide React
-
-Smart Contract
-
-Midnight Compact
-
-Blockchain
-
-Midnight Preprod
-
-Wallet
-
-1AM Wallet
-
-Connector
-
-Midnight DApp Connector API
-
-ZK Testing
-
-Midnight Compact / testkit tooling
-
-Testing
-
-Vitest 2.1.9
-
-Runtime
-
-Node.js 22+
-
-Deployment
-
-Vercel
-
-CI/CD
-
-GitHub Actions
-
-Repository
-
-GitHub
-
-📁 Project Structure
-
+```text
 Private Revenue Split/
 │
 ├── .github/
@@ -671,9 +540,7 @@ Private Revenue Split/
 │       └── ci.yml
 │
 ├── contracts/
-│   └── revenue-split.compact
-│
-├── contracts/
+│   ├── revenue-split.compact
 │   └── managed/
 │       └── RevenueSplit/
 │
@@ -715,97 +582,102 @@ Private Revenue Split/
 ├── package-lock.json
 ├── tsconfig.json
 └── README.md
+```
 
-🚀 Local Setup & Development
+---
 
-1. Prerequisites
+## 🚀 Local Setup & Development
 
-Install:
+### 1. Prerequisites
 
-Node.js 22+
+Install the following before continuing:
 
-npm
+- Node.js 22+
+- npm
+- Chromium-based browser
+- 1AM Wallet browser extension
+- Docker (if the local proof-server workflow is required)
 
-Chromium-based browser
+### 2. Clone Repository
 
-1AM Wallet browser extension
-
-Docker if the local proof-server workflow is required
-
-2. Clone Repository
-
+```bash
 git clone https://github.com/Nandini-Jadhav1/revenue-split.git
 cd revenue-split
+```
 
-3. Install Dependencies
+### 3. Install Dependencies
 
+```bash
 npm ci
+```
 
-4. Start Development Server
+### 4. Start Development Server
 
+```bash
 npm run dev
+```
 
 Open the local Vite URL shown in the terminal.
 
-🧪 Testing, Linting & Verification
+---
 
-The latest verified local checks are:
+## 🧪 Testing, Linting & Verification
 
-TypeScript Check
+### TypeScript Check
 
+```bash
 npx tsc --noEmit
+```
 
-Result:
+**Result:** 0 TypeScript errors
 
-0 TypeScript errors
+### Automated Tests
 
-Automated Tests
-
+```bash
 npm test
+```
 
-Latest result:
+**Latest result:**
 
+```text
 RUN  v2.1.9
 
 Test Files  1 passed (1)
 Tests       3 passed (3)
+```
 
-Test Coverage
+### Test Coverage
 
-Test 1 — Valid Split
-
-Verifies:
-
-Total input/output consistency
-
-Valid recipient claim
-
-Correct split behavior
-
-Test 2 — Invalid Split Attempt
+**Test 1 — Valid Split**
 
 Verifies:
+- Total input/output consistency
+- Valid recipient claim
+- Correct split behavior
 
-Invalid split conditions are rejected
-
-Invalid witness information is rejected
-
-Test 3 — Privacy & Access Control
+**Test 2 — Invalid Split Attempt**
 
 Verifies:
+- Invalid split conditions are rejected
+- Invalid witness information is rejected
 
-Recipient cannot claim another recipient's private share
+**Test 3 — Privacy & Access Control**
 
-Double claim is rejected
+Verifies:
+- Recipient cannot claim another recipient's private share
+- Double claim is rejected
 
-🏭 Production Build
+---
 
-Run:
+## 🏭 Production Build
 
+```bash
 npm run build
+```
 
-Latest verified result:
+**Latest verified result:**
 
+```text
 vite v6.4.3 building for production...
 ✓ 1596 modules transformed.
 
@@ -814,37 +686,37 @@ dist/assets/index-X75Bl-LT.css   39.17 kB
 dist/assets/index-BT5Da75G.js   242.92 kB
 
 ✓ built successfully
+```
 
-The production Vite build completed successfully.
+---
 
-🔄 CI/CD
+## 🔄 CI/CD
 
-The project includes a GitHub Actions workflow:
+The project includes a GitHub Actions workflow at `.github/workflows/ci.yml`. The repository is connected to Vercel for production deployment, which updates when changes are pushed to the configured branch.
 
-.github/workflows/ci.yml
+---
 
-The repository is connected to Vercel for production deployment.
+## ☁️ Vercel Deployment
 
-Vercel production deployment is updated when changes are pushed to the configured branch.
-
-☁️ Vercel Deployment
-
-Production URL
-
-https://revenue-split-nu.vercel.app
+**Production URL:** https://revenue-split-nu.vercel.app
 
 The Vercel dashboard confirms the deployment is:
 
-Status: Ready
+```text
+Status:      Ready
 Environment: Production
-Branch: main
+Branch:      main
+```
 
 The deployed application displays the Private Revenue Split Preprod dashboard.
 
-📝 User Feedback System
+---
+
+## 📝 User Feedback System
 
 Private Revenue Split uses a structured feedback loop:
 
+```text
 Build
   ↓
 Deploy
@@ -860,71 +732,52 @@ Prioritize Improvements
 Implement Changes
   ↓
 Update Documentation
+```
 
-Feedback Form
+- **Feedback Form:** https://docs.google.com/forms/d/1rhrEcQg1HiFBwoY59cFKXp5K8nU4WeMpskPLNH6Edrk/viewform
+- **Feedback Response Sheet:** https://docs.google.com/spreadsheets/d/1vW6SEV52-JAy9A4Y3DYNu8F8dijMZnh64fwbAbs9s/edit?gid=2082627229
 
-https://docs.google.com/forms/d/1rhrEcQg1HiFBwoY59cFKXp5K8nU4WeMpskPLNH6Edrk/viewform
+---
 
-Feedback Response Sheet
-
-https://docs.google.com/spreadsheets/d/1vW6SEV52-JAy9A4Y3DYNu8F8dijMZnh64fwbAbs9s/edit?gid=2082627229
-
-💬 Feedback-Driven Improvements
+## 💬 Feedback-Driven Improvements
 
 The Level 6 implementation specifically addressed two major feedback areas.
 
-Feedback Item 1 — Transaction Success Visibility
+### Feedback Item 1 — Transaction Success Visibility
 
-User need:
+**User need:** Users wanted clear confirmation after a successful blockchain transaction.
 
-Users wanted clear confirmation after a successful blockchain transaction.
+**Implemented:**
+- Transaction success state
+- Claim success notification
+- Register success notification
+- Truncated transaction ID
+- Manual close button
+- 8-second automatic dismissal
+- Slide-in animation
+- Success-only trigger
 
-Implemented:
+### Feedback Item 2 — UI Clarity
 
-Transaction success state
+**User need:** Users wanted clearer actions and easier-to-understand transaction controls.
 
-Claim success notification
+**Implemented:**
+- Simplified button text
+- Larger action buttons
+- Improved visual hierarchy
+- Better focus states
+- Improved disabled states
+- Redesigned demo credential cards
+- Percentage indicators
+- Improved spacing
 
-Register success notification
+---
 
-Truncated transaction ID
-
-Manual close button
-
-8-second automatic dismissal
-
-Slide-in animation
-
-Success-only trigger
-
-Feedback Item 2 — UI Clarity
-
-User need:
-
-Users wanted clearer actions and easier-to-understand transaction controls.
-
-Implemented:
-
-Simplified button text
-
-Larger action buttons
-
-Improved visual hierarchy
-
-Better focus states
-
-Improved disabled states
-
-Redesigned demo credential cards
-
-Percentage indicators
-
-Improved spacing
-
-🧾 Transaction Notification Specification
+## 🧾 Transaction Notification Specification
 
 The success notification is intentionally tied to successful transaction execution.
 
+```text
 connectedApi.buildAndSubmitContractCall()
                  │
           ┌──────┴──────┐
@@ -939,12 +792,15 @@ connectedApi.buildAndSubmitContractCall()
           │
           ▼
  Auto-dismiss 8 sec
+```
 
 The application does not display a successful transaction message merely because a user clicked a button.
 
-🧪 Manual End-to-End Verification
+---
 
-Recommended Preprod test:
+## 🧪 Manual End-to-End Verification
+
+Recommended Preprod test sequence:
 
 1. Open the live demo
 2. Connect 1AM Wallet
@@ -962,47 +818,40 @@ Recommended Preprod test:
 14. Attempt an invalid or duplicate claim
 15. Confirm the invalid claim is rejected
 
-⚠️ Known Limitations
+---
 
-The application targets Midnight Preprod rather than mainnet.
+## ⚠️ Known Limitations
 
-1AM Wallet is the intended wallet integration.
+- The application targets Midnight Preprod rather than mainnet
+- 1AM Wallet is the intended wallet integration
+- Real blockchain interactions require a funded Preprod wallet
+- ZK proof generation may require the configured proof-server environment
+- Demo credentials are for testing and demonstration only
+- Mobile and accessibility behavior should still be manually verified across a broad device/browser matrix
+- Preprod testnet behavior can change independently of the application
 
-Real blockchain interactions require a funded Preprod wallet.
+---
 
-ZK proof generation may require the configured proof-server environment.
-
-Demo credentials are for testing and demonstration only.
-
-Mobile and accessibility behavior should still be manually verified across a broad device/browser matrix.
-
-Preprod testnet behavior can change independently of the application.
-
-🔐 Security Notes
+## 🔐 Security Notes
 
 Private Revenue Split is a privacy-focused MVP and should be treated as experimental software.
 
-Important principles
+**Important principles:**
 
-Never place real production secrets into demo credential fields.
+- Never place real production secrets into demo credential fields
+- Never commit private keys, wallet seed phrases, or passwords
+- Use testnet credentials for Preprod demonstrations
+- Verify wallet transactions before approving them
+- Treat transaction IDs and public wallet addresses as blockchain metadata
+- Do not assume Preprod provides production-level financial guarantees
 
-Never commit private keys, wallet seed phrases, or passwords.
-
-Use testnet credentials for Preprod demonstrations.
-
-Verify wallet transactions before approving them.
-
-Treat transaction IDs and public wallet addresses as blockchain metadata.
-
-Do not assume Preprod provides production-level financial guarantees.
+---
 
 ## 👥 Preprod Users Verification
 
 Level 6 requires 70+ verifiable Preprod user wallet addresses that have interacted with the deployed contract.
 
 ### Verification Script
-
-The project includes an automated script to fetch and verify Preprod users:
 
 ```bash
 npm run fetch-users
@@ -1017,7 +866,8 @@ npm run fetch-users
 4. Displays count and verification status against 70-user requirement
 
 **Sample Output:**
-```
+
+```text
 🔍 Fetching Preprod user wallet addresses...
 📝 Contract: [will be populated after deployment]
 🌐 Indexer: https://indexer.preprod.midnight.network/api/v4/graphql
@@ -1037,299 +887,137 @@ npm run fetch-users
 - Publicly auditable via blockchain explorer
 - Real wallet interactions, not simulated
 
-**Commit:** `98eabfc` - "feat: add script to fetch Preprod user addresses from indexer"
+**Commit:** `98eabfc` — "feat: add script to fetch Preprod user addresses from indexer"
 
 ---
 
-📊 Level 6 Verification Status
-
-Requirement
-
-Status
-
-Evidence
-
-Working MVP
-
-✅
-
-Live Vercel application
-
-Midnight Preprod
-
-✅
-
-Preprod dashboard
-
-1AM Wallet Integration
-
-✅
-
-Wallet connection UI
-
-Private Revenue Split Workflow
-
-✅
-
-Register + Claim flows
-
-Compact Smart Contract
-
-✅
-
-contracts/revenue-split.compact
-
-ZK Proof Workflow
-
-✅
-
-Private claim flow
-
-Automated Tests
-
-✅
-
-3/3 passed
-
-TypeScript Check
-
-✅
-
-0 errors
-
-Production Build
-
-✅
-
-Vite build successful
-
-Transaction Success UI
-
-✅
-
-RevenueSplit.tsx
-
-Feedback Documentation
-
-✅
-
-docs/FEEDBACK.md
-
-Google Feedback Form
-
-✅
-
-Published feedback form
-
-Google Response Sheet
-
-✅
-
-Feedback response sheet
-
-Vercel Deployment
-
-✅
-
-revenue-split-nu.vercel.app
-
-Demo Video
-
-✅
-
-YouTube walkthrough
-
-GitHub Repository
-
-✅
-
-Nandini-Jadhav1/revenue-split
-
-🏆 Level 6 Submission Evidence
-
-Evidence
-
-Link / Location
-
-GitHub
-
-https://github.com/Nandini-Jadhav1/revenue-split
-
-Live Demo
-
-https://revenue-split-nu.vercel.app
-
-Demo Video
-
-https://youtu.be/yyFmQHbjRrc
-
-Feedback Form
-
-Google Forms link above
-
-Feedback Responses
-
-Google Sheets link above
-
-Feedback Documentation
-
-docs/FEEDBACK.md
-
-Usage Documentation
-
-docs/USAGE.md
-
-Smart Contract
-
-contracts/revenue-split.compact
-
-Automated Tests
-
-tests/revenue-split.test.ts
-
-📌 Project Status
-
-Verified
-
-React frontend
-
-TypeScript compilation
-
-Midnight Preprod configuration
-
-1AM Wallet integration
-
-Compact smart contract
-
-Private recipient claim workflow
-
-Split-rule registration
-
-Privacy/access-control tests
-
-Double-claim prevention tests
-
-Transaction success notification
-
-Error handling
-
-UI improvements
-
-Production Vite build
-
-Vercel deployment
-
-Demo video
-
-User feedback form
-
-Feedback response spreadsheet
-
-Feedback documentation
-
-Recommended Manual Verification
-
-Execute a fresh real 1AM Wallet register transaction
-
-Execute a fresh real 1AM Wallet claim transaction
-
-Confirm success notification after both real transactions
-
-Verify mobile responsive layout
-
-Verify accessibility/screen-reader announcements
-
-🚀 Future Roadmap
+## 📊 Level 6 Verification Status
+
+| Requirement | Status | Evidence |
+|---|---|---|
+| Working MVP | ✅ | Live Vercel application |
+| Midnight Preprod | ✅ | Preprod dashboard |
+| 1AM Wallet Integration | ✅ | Wallet connection UI |
+| Private Revenue Split Workflow | ✅ | Register + Claim flows |
+| Compact Smart Contract | ✅ | contracts/revenue-split.compact |
+| ZK Proof Workflow | ✅ | Private claim flow |
+| Automated Tests | ✅ | 3/3 passed |
+| TypeScript Check | ✅ | 0 errors |
+| Production Build | ✅ | Vite build successful |
+| Transaction Success UI | ✅ | RevenueSplit.tsx |
+| Feedback Documentation | ✅ | docs/FEEDBACK.md |
+| Google Feedback Form | ✅ | Published feedback form |
+| Google Response Sheet | ✅ | Feedback response sheet |
+| Vercel Deployment | ✅ | revenue-split-nu.vercel.app |
+| Demo Video | ✅ | YouTube walkthrough |
+| GitHub Repository | ✅ | Nandini-Jadhav1/revenue-split |
+
+---
+
+## 🏆 Level 6 Submission Evidence
+
+| Evidence | Link / Location |
+|---|---|
+| GitHub | https://github.com/Nandini-Jadhav1/revenue-split |
+| Live Demo | https://revenue-split-nu.vercel.app |
+| Demo Video | https://youtu.be/yyFmQHbjRrc |
+| Feedback Form | https://docs.google.com/forms/d/1rhrEcQg1HiFBwoY59cFKXp5K8nU4WeMpskPLNH6Edrk/viewform |
+| Feedback Responses | https://docs.google.com/spreadsheets/d/1vW6SEV52-JAy9A4Y3DYNu8F8dijMZnh64fwbAbs9s/edit?gid=2082627229 |
+| Feedback Documentation | docs/FEEDBACK.md |
+| Usage Documentation | docs/USAGE.md |
+| Smart Contract | contracts/revenue-split.compact |
+| Automated Tests | tests/revenue-split.test.ts |
+
+---
+
+## 📌 Project Status
+
+**Verified:**
+
+- ✅ React frontend
+- ✅ TypeScript compilation
+- ✅ Midnight Preprod configuration
+- ✅ 1AM Wallet integration
+- ✅ Compact smart contract
+- ✅ Private recipient claim workflow
+- ✅ Split-rule registration
+- ✅ Privacy/access-control tests
+- ✅ Double-claim prevention tests
+- ✅ Transaction success notification
+- ✅ Error handling
+- ✅ UI improvements
+- ✅ Production Vite build
+- ✅ Vercel deployment
+- ✅ Demo video
+- ✅ User feedback form
+- ✅ Feedback response spreadsheet
+- ✅ Feedback documentation
+
+**Recommended Manual Verification:**
+
+- Execute a fresh real 1AM Wallet register transaction
+- Execute a fresh real 1AM Wallet claim transaction
+- Confirm success notification after both real transactions
+- Verify mobile responsive layout
+- Verify accessibility/screen-reader announcements
+
+---
+
+## 🚀 Future Roadmap
 
 Potential future improvements include:
 
-More recipient configurations
+- More recipient configurations
+- Improved recipient onboarding
+- Additional privacy-preserving payment flows
+- Richer transaction history
+- Enhanced Preprod analytics
+- More detailed accessibility support
+- Mobile-first workflow improvements
+- Production-grade security audit
+- Mainnet readiness after protocol stabilization
 
-Improved recipient onboarding
+---
 
-Additional privacy-preserving payment flows
+## 📚 Documentation Index
 
-Richer transaction history
-
-Enhanced Preprod analytics
-
-More detailed accessibility support
-
-Mobile-first workflow improvements
-
-Production-grade security audit
-
-Mainnet readiness after protocol stabilization
-
-📚 Documentation Index
-
+```text
 docs/
 ├── FEEDBACK.md
 ├── PREPROD_USERS.md
 └── USAGE.md
+```
 
-FEEDBACK.md
+- **FEEDBACK.md** — Documents the user feedback and the Level 6 improvements implemented from that feedback
+- **PREPROD_USERS.md** — Contains project-specific Preprod testing information
+- **USAGE.md** — Provides instructions for using the application
 
-Documents the user feedback and the Level 6 improvements implemented from that feedback.
+---
 
-PREPROD_USERS.md
+## 📄 License
 
-Contains project-specific Preprod testing information.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for the complete license text.
 
-USAGE.md
+---
 
-Provides instructions for using the application.
+## 🙏 Acknowledgements
 
-👤 Project
+- [Midnight Network](https://midnight.network/) — developer tooling and Compact ecosystem
+- 1AM Wallet
+- [React](https://react.dev/)
+- [Vite](https://vitejs.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vitest](https://vitest.dev/)
+- [Vercel](https://vercel.com/)
+- [GitHub Actions](https://github.com/features/actions)
 
-Private Revenue Split
+---
 
-Built for privacy-preserving revenue distribution using:
-
-Midnight Network
-        +
-Compact Smart Contracts
-        +
-Zero-Knowledge Proofs
-        +
-1AM Wallet
-        +
-React / TypeScript
-
-📄 License
-
-This project is licensed under the MIT License.
-
-See:
-
-LICENSE
-
-for the complete license text.
-
-🙏 Acknowledgements
-
-Midnight Network
-
-Midnight developer tooling and Compact ecosystem
-
-1AM Wallet
-
-React
-
-Vite
-
-TypeScript
-
-Vitest
-
-Vercel
-
-GitHub Actions
-
-🌕 Level 6 — Supermoon Edition
+## 🌕 Level 6 — Supermoon Edition
 
 Private Revenue Split demonstrates how confidential revenue distribution can combine:
 
+```text
 Private Witnesses
        +
 Zero-Knowledge Proofs
@@ -1339,7 +1027,10 @@ Compact Smart Contracts
 1AM Wallet Authorization
        +
 Midnight Preprod
+```
 
 The Level 6 iteration focuses on privacy, transaction transparency at the UX layer, clearer user actions, feedback-driven improvements, and a complete verifiable submission trail.
 
-Private Revenue Split — split revenue privately.
+---
+
+*Private Revenue Split — split revenue privately.*
