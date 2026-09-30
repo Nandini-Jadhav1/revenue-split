@@ -1,5 +1,5 @@
 /**
- * Deploy RevenueSplit Contract to Midnight Preprod
+ * Deploy RevenueSplit Contract to Midnight Preview
  * 
  * Based on official example-bboard deployment pattern
  * - midnight-js-contracts 4.1.1

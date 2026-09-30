@@ -6,8 +6,8 @@ dist/
 .env
 .env.*
 
-# Midnight deployment secrets
-.contract-address
+# Midnight deployment secrets — wallet state only, NOT the contract address
+# .contract-address is intentionally tracked (public on-chain address, not a secret)
 revenue-split-private-state/
 revenue-split-signing-keys/
 

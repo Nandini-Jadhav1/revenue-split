@@ -1,19 +1,13 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState } from 'react';
 import {
   ShieldCheck, Lock, Unlock, CheckCircle2,
   AlertCircle, Sparkles, RefreshCw, Layers, Coins, EyeOff, Eye, UserCheck, Key,
   Copy, Check, Terminal,
 } from 'lucide-react';
-import { contractHelper, PoolState } from '../utils/contract';
+import { fromOnChainState, encodeWitness, encodeCommitment, bytesToHex } from '../utils/contract';
+import { useLedgerState } from '../hooks/useLedgerState';
 import { useWallet } from '../contexts/WalletContext';
-
-// Deployed Preprod contract (recovered from git commit 6289b0d)
-// NOTE: ZK proof generation and transaction submission are handled entirely by
-// the 1AM wallet extension (connectedApi.buildAndSubmitContractCall).
-// The Node-only Midnight SDK providers (NodeZkConfigProvider, levelPrivateStateProvider,
-// httpClientProofProvider) cannot run in a browser bundle — the wallet extension
-// manages the proof server connection internally on its own Node.js backend.
-const CONTRACT_ADDRESS = '02005a9c0897f1da76135dd6977be415f3cf374466986b24d77eb60cbe4eeef45a8e';
+import { CONTRACT_ADDRESS, POOL_ID } from '../config/network';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared primitives  (pure UI — no logic)
@@ -36,7 +30,6 @@ const Badge: React.FC<{
   );
 };
 
-// Field label + input + helper-text wrapper
 const Field: React.FC<{
   id: string;
   label: React.ReactNode;
@@ -52,44 +45,42 @@ const Field: React.FC<{
   </div>
 );
 
-// Shared input class — tall, readable, clear focus state
-const inputCls =
-  'field-input';
+const inputCls = 'field-input';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const RevenueSplit: React.FC = () => {
-  const [poolState, setPoolState] = useState<PoolState>(contractHelper.getLedgerState());
+  const { ledger, isLoading, isFetching, refresh } = useLedgerState();
+  const poolState = fromOnChainState(ledger);
   const [activeTab, setActiveTab] = useState<'claim' | 'register' | 'overview' | 'logs'>('claim');
 
   // Claim form
-  const [claimSecret,        setClaimSecret]        = useState('alice_secret_123');
-  const [claimSalt,          setClaimSalt]           = useState('salt_alice_999');
-  const [claimAmount,        setClaimAmount]         = useState('700');
-  const [showSecret,         setShowSecret]          = useState(false);
-  const [isGeneratingProof,  setIsGeneratingProof]  = useState(false);
-  const [claimSuccess,       setClaimSuccess]        = useState<{ nullifierHex: string; amount: bigint } | null>(null);
-  const [claimError,         setClaimError]          = useState<string | null>(null);
-  const [copiedNullifier,    setCopiedNullifier]     = useState(false);
+  const [claimSecret, setClaimSecret] = useState('alice_secret_123');
+  const [claimSalt, setClaimSalt] = useState('salt_alice_999');
+  const [claimAmount, setClaimAmount] = useState('700');
+  const [showSecret, setShowSecret] = useState(false);
+  const [isGeneratingProof, setIsGeneratingProof] = useState(false);
+  const [claimSuccess, setClaimSuccess] = useState<{ txId: string; nullifierHex: string; amount: bigint } | null>(null);
+  const [claimError, setClaimError] = useState<string | null>(null);
+  const [copiedNullifier, setCopiedNullifier] = useState(false);
 
   // Register form
-  const [regSecret,       setRegSecret]       = useState('');
-  const [regSalt,         setRegSalt]         = useState('');
-  const [regShare,        setRegShare]        = useState('');
+  const [regSecret, setRegSecret] = useState('');
+  const [regSalt, setRegSalt] = useState('');
+  const [regShare, setRegShare] = useState('');
   const [regAddedRevenue, setRegAddedRevenue] = useState('0');
-  const [isRegistering,   setIsRegistering]   = useState(false);
-  const [regSuccess,      setRegSuccess]      = useState<string | null>(null);
-  const [regError,        setRegError]        = useState<string | null>(null);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [regSuccess, setRegSuccess] = useState<string | null>(null);
+  const [regError, setRegError] = useState<string | null>(null);
 
   // Proof logs
   const [logs, setLogs] = useState<Array<{
     id: number; timestamp: string; message: string; type: 'info' | 'success' | 'zk';
   }>>([
-    { id: 1, timestamp: new Date().toLocaleTimeString(), message: 'Compact ZK Circuit initialized with 0 errors.', type: 'info' },
-    { id: 2, timestamp: new Date().toLocaleTimeString(), message: 'Ledger state synced: Pool balance 1,000 tDUST.',  type: 'info' },
-    { id: 3, timestamp: new Date().toLocaleTimeString(), message: 'Initial commitments seeded for Alice (700) & Bob (300).', type: 'zk' },
+    { id: 1, timestamp: new Date().toLocaleTimeString(), message: 'Live indexer sync enabled — polling every 15s.', type: 'info' },
+    { id: 2, timestamp: new Date().toLocaleTimeString(), message: `Contract ${CONTRACT_ADDRESS.slice(0, 16)}... monitoring Preprod.`, type: 'info' },
   ]);
 
   const addLog = (message: string, type: 'info' | 'success' | 'zk' = 'info') => {
@@ -99,59 +90,8 @@ export const RevenueSplit: React.FC = () => {
     ]);
   };
 
-  const refreshState = () => {
-    setPoolState(contractHelper.getLedgerState());
-    addLog('Ledger state refreshed.', 'info');
-  };
-
-  useEffect(() => { refreshState(); }, []);
-
-  // ── Wallet state ──────────────────────────────────────────────────────────
   const { address, isConnected, connectedApi } = useWallet();
 
-  // Deployed Preprod contract address (recovered from git commit 6289b0d)
-  const CONTRACT_ADDRESS = '02005a9c0897f1da76135dd6977be415f3cf374466986b24d77eb60cbe4eeef45a8e';
-
-  /** Encode a UTF-8 string into a 32-byte Uint8Array (zero-padded). */
-  const str32 = (s: string): Uint8Array => {
-    const buf = new Uint8Array(32);
-    buf.set(new TextEncoder().encode(s).slice(0, 32));
-    return buf;
-  };
-
-  /**
-   * Compute nullifier = FNV-like hash(secret || poolId).
-   * Matches the RevenueSplit Compact circuit's on-chain logic.
-   * The result is unique per (secret, poolId) pair — never the same across sessions
-   * with different inputs.
-   */
-  const computeNullifier = (secret: Uint8Array, poolId: Uint8Array): string => {
-    const buf = new Uint8Array(64);
-    buf.set(secret, 0);
-    buf.set(poolId, 32);
-    let h = 0x811c9dc5;
-    for (let i = 0; i < buf.length; i++) {
-      h ^= buf[i];
-      h = Math.imul(h, 0x01000193);
-    }
-    let hex = '';
-    for (let i = 0; i < 32; i++) {
-      hex += ((h ^ (i * 31) ^ (buf[i % 64] || i)) & 0xff).toString(16).padStart(2, '0');
-    }
-    return hex;
-  };
-
-  // ── Claim handler (real 1AM wallet API — no simulation) ───────────────────
-  // Architecture:
-  //   The 1AM wallet extension implements its own ZK proof pipeline internally.
-  //   connectedApi.buildAndSubmitContractCall() handles:
-  //     - Loading the proving key from the wallet's own proof server
-  //     - Generating the ZK proof off-chain inside the extension
-  //     - Balancing the transaction
-  //     - Submitting to Midnight Preprod
-  //   We never call setTimeout(), contractHelper.claimPrivatePayout(), or any
-  //   Node-only SDK provider (NodeZkConfigProvider, levelPrivateStateProvider, etc.)
-  //   from this browser component.
   const handleClaim = async (e: React.FormEvent) => {
     e.preventDefault();
     setClaimError(null);
@@ -160,65 +100,62 @@ export const RevenueSplit: React.FC = () => {
     addLog(`Initiating ZK proof for claim: ${claimAmount} tDUST...`, 'zk');
 
     try {
-      // 1. Wallet connection guard
       if (!isConnected || !address) {
         throw new Error('Wallet not connected. Connect your 1AM Wallet first.');
       }
 
-      // 2. Input validation
       if (!claimSecret || !claimSalt || !claimAmount) {
         throw new Error('Please fill in all private witness fields.');
       }
       const amountBigInt = BigInt(claimAmount);
       if (amountBigInt <= 0n) throw new Error('Claim amount must be greater than zero.');
 
-      // 3. Get 1AM ConnectedAPI (use shared context instance, fallback to reconnect if needed)
       const midnight = (window as any).midnight;
       const api = connectedApi || await midnight['1am'].connect('preprod');
       addLog(`Wallet: ${address.slice(0, 16)}...`, 'info');
 
-      // 4. Build private witness inputs
-      const recipientSecret = str32(claimSecret);
-      const recipientSalt   = str32(claimSalt);
-      const poolId          = new Uint8Array(32).fill(0x99);
-
-      // 5. Submit the real contract call via the 1AM wallet's contract call API.
-      //    The wallet extension handles: ZK proof generation, transaction balancing,
-      //    and submission to Midnight Preprod. Real network requests fire here.
-      addLog('Submitting contract call to 1AM wallet for ZK proof and Preprod submission...', 'zk');
+      const witness = encodeWitness(claimSecret, claimSalt);
+      addLog('Submitting contract call to 1AM wallet for ZK proof generation...', 'zk');
       addLog(`Contract: ${CONTRACT_ADDRESS}`, 'info');
 
       const callResult = await api.buildAndSubmitContractCall({
         contractAddress: CONTRACT_ADDRESS,
         circuitId: 'claimPayout',
-        args: [
-          { recipientSecret, recipientSalt },  // witness
-          amountBigInt,                         // claimAmount
-          poolId,                               // poolId
-        ],
+        args: [witness, amountBigInt, POOL_ID],
       });
 
-      // 6. Extract real on-chain result
-      const txId         = callResult?.txId ?? callResult?.txHash ?? callResult?.transactionId;
-      const nullifierHex = computeNullifier(recipientSecret, poolId);
-
+      const txId = callResult?.txId ?? callResult?.txHash ?? callResult?.transactionId;
       if (!txId) throw new Error('Transaction submitted but no transaction ID returned.');
 
-      addLog(`TX confirmed on Preprod: ${txId}`, 'success');
-      setClaimSuccess({ nullifierHex, amount: amountBigInt });
+      const nullifierHex = bytesToHex(
+        (() => {
+          const buf = new Uint8Array(64);
+          buf.set(witness.recipientSecret, 0);
+          buf.set(POOL_ID, 32);
+          let h = 0x811c9dc5;
+          for (let i = 0; i < buf.length; i++) { h ^= buf[i]; h = Math.imul(h, 0x01000193); }
+          const out = new Uint8Array(32);
+          for (let i = 0; i < 32; i++) out[i] = (h ^ (i * 31) ^ (buf[i % 64] || i)) & 0xff;
+          return out;
+        })()
+      );
+
+      addLog(`TX confirmed on Preprod: ${txId.slice(0, 16)}...`, 'success');
+      setClaimSuccess({ txId, nullifierHex, amount: amountBigInt });
       addLog(`Nullifier: ${nullifierHex.slice(0, 16)}...`, 'success');
       addLog(`Private payout of ${amountBigInt} tDUST claimed on Midnight Preprod.`, 'success');
-      refreshState();
+      
+      setTimeout(() => refresh(), 2000);
 
     } catch (err: any) {
       const msg: string = err?.message ?? 'Failed to claim payout.';
       const friendly =
         /dust|DUST|insufficient/i.test(msg)
-          ? 'Insufficient DUST balance — fund your wallet at https://midnight-tmnight-preprod.nethermind.dev/'
+          ? 'Insufficient DUST balance — fund your wallet at the Midnight Preprod faucet.'
           : /rejected|user denied|Rejected/i.test(msg)
           ? 'Connection rejected in 1AM Wallet.'
           : /buildAndSubmitContractCall|not a function|undefined/i.test(msg)
-          ? `1AM wallet API does not support direct contract calls in this version (${msg}). The proof server flow requires a deployed backend. See README for deployment instructions.`
+          ? `1AM wallet API does not support direct contract calls. Ensure you have the latest 1AM extension.`
           : msg;
       setClaimError(friendly);
       addLog(`Claim failed: ${friendly}`, 'info');
@@ -227,7 +164,6 @@ export const RevenueSplit: React.FC = () => {
     }
   };
 
-  // ── Register handler (real 1AM wallet API — no simulation) ────────────────
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setRegError(null);
@@ -243,43 +179,32 @@ export const RevenueSplit: React.FC = () => {
         throw new Error('Please fill in recipient secret, salt, and private cut amount.');
       }
 
-      const shareBigInt    = BigInt(regShare);
+      const shareBigInt = BigInt(regShare);
       const addedRevBigInt = BigInt(regAddedRevenue || '0');
 
       const midnight = (window as any).midnight;
       const api = connectedApi || await midnight['1am'].connect('preprod');
 
-      // Compute commitment = FNV-like hash(secret || salt || amount)
-      const secret = str32(regSecret);
-      const salt   = str32(regSalt);
-      const commitment = (() => {
-        const buf = new Uint8Array(72);
-        buf.set(secret, 0);
-        buf.set(salt, 32);
-        new DataView(buf.buffer, 64, 8).setBigUint64(0, shareBigInt, false);
-        let h = 0x811c9dc5;
-        for (let i = 0; i < buf.length; i++) { h ^= buf[i]; h = Math.imul(h, 0x01000193); }
-        const out = new Uint8Array(32);
-        for (let i = 0; i < 32; i++) out[i] = (h ^ (i * 31) ^ (buf[i % 72] || i)) & 0xff;
-        return out;
-      })();
+      const organizerSecret = new Uint8Array(32).fill(0xaa);
+      const commitment = encodeCommitment(regSecret, regSalt, shareBigInt);
 
       addLog('Submitting registerRecipient contract call via 1AM wallet...', 'zk');
 
       const callResult = await api.buildAndSubmitContractCall({
         contractAddress: CONTRACT_ADDRESS,
         circuitId: 'registerRecipient',
-        args: [secret, commitment, addedRevBigInt],
+        args: [organizerSecret, commitment, addedRevBigInt],
       });
 
-      const txId    = callResult?.txId ?? callResult?.txHash ?? callResult?.transactionId;
+      const txId = callResult?.txId ?? callResult?.txHash ?? callResult?.transactionId;
       if (!txId) throw new Error('Transaction submitted but no transaction ID returned.');
 
-      const succMsg = `Commitment registered on-chain: ${txId.slice(0, 16)}...`;
+      const succMsg = `Commitment registered on-chain. TX: ${txId.slice(0, 16)}...`;
       setRegSuccess(succMsg);
-      addLog(`${succMsg}`, 'success');
+      addLog(succMsg, 'success');
       setRegSecret(''); setRegSalt(''); setRegShare('');
-      refreshState();
+      
+      setTimeout(() => refresh(), 2000);
 
     } catch (err: any) {
       const msg: string = err?.message ?? 'Failed to register recipient.';
@@ -287,7 +212,7 @@ export const RevenueSplit: React.FC = () => {
         /dust|DUST|insufficient/i.test(msg)
           ? 'Insufficient DUST balance — fund your wallet from the Midnight Preprod faucet.'
           : /buildAndSubmitContractCall|not a function|undefined/i.test(msg)
-          ? `1AM wallet API does not support direct contract calls in this version. See README.`
+          ? `1AM wallet API does not support direct contract calls.`
           : msg;
       setRegError(friendly);
       addLog(`Registration error: ${friendly}`, 'info');
@@ -295,39 +220,31 @@ export const RevenueSplit: React.FC = () => {
       setIsRegistering(false);
     }
   };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedNullifier(true);
     setTimeout(() => setCopiedNullifier(false), 2000);
   };
 
-  // ── Tab definitions ─────────────────────────────────────────────────────────
-
   const tabs = [
-    { id: 'claim'    as const, icon: <Key      className="w-4 h-4" />, label: 'Claim Private Cut'  },
-    { id: 'register' as const, icon: <Lock     className="w-4 h-4" />, label: 'Register Split'     },
-    { id: 'overview' as const, icon: <Layers   className="w-4 h-4" />, label: 'Privacy Model'      },
-    { id: 'logs'     as const, icon: <Terminal className="w-4 h-4" />, label: 'Proof Logs'         },
+    { id: 'claim' as const, icon: <Key className="w-4 h-4" />, label: 'Claim Private Cut' },
+    { id: 'register' as const, icon: <Lock className="w-4 h-4" />, label: 'Register Split' },
+    { id: 'overview' as const, icon: <Layers className="w-4 h-4" />, label: 'Privacy Model' },
+    { id: 'logs' as const, icon: <Terminal className="w-4 h-4" />, label: 'Proof Logs' },
   ] as const;
-
-  // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <div className="space-y-10">
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          Hero banner
-      ══════════════════════════════════════════════════════════════════════ */}
+      {/* Hero banner */}
       <div className="relative overflow-hidden rounded-2xl border border-indigo-500/15
                       bg-gradient-to-br from-indigo-950/40 via-[#09102a]/70 to-[#07091a]/90
                       px-8 sm:px-10 py-10 sm:py-12">
-        {/* Decorative orb */}
         <div className="pointer-events-none absolute -top-24 -right-24 w-80 h-80 rounded-full
                         bg-indigo-600/6 blur-[80px]" />
 
-        <div className="relative flex flex-col lg:flex-row items-start lg:items-center
-                        justify-between gap-8">
-          {/* Left — branding & description */}
+        <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
           <div className="space-y-5 flex-1 min-w-0 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2.5">
               <Badge variant="indigo">
@@ -336,6 +253,11 @@ export const RevenueSplit: React.FC = () => {
               <Badge variant="emerald">
                 <CheckCircle2 className="w-3.5 h-3.5" /> ZK Auditable
               </Badge>
+              {poolState.isLive && (
+                <Badge variant="cyan">
+                  <RefreshCw className="w-3 h-3" /> Live On-Chain
+                </Badge>
+              )}
             </div>
 
             <div className="space-y-3">
@@ -350,17 +272,15 @@ export const RevenueSplit: React.FC = () => {
             </div>
           </div>
 
-          {/* Right — contract status */}
           <div className="shrink-0 w-full lg:w-auto">
-            <div className="rounded-xl border border-white/[0.06] bg-[#07091a]/70
-                            px-5 py-4 space-y-3 min-w-[210px]">
+            <div className="rounded-xl border border-white/[0.06] bg-[#07091a]/70 px-5 py-4 space-y-3 min-w-[210px]">
               <p className="text-[11px] font-mono font-medium text-slate-600 uppercase tracking-widest mb-1">
                 Contract Status
               </p>
               {[
-                { label: 'State',    value: 'Active',           color: 'text-emerald-400' },
-                { label: 'Compiler', value: 'Compact v0.16',    color: 'text-indigo-300'  },
-                { label: 'Proofs',   value: 'Off-Chain Witness', color: 'text-purple-300'  },
+                { label: 'State', value: poolState.isLive ? 'Live' : 'Loading', color: poolState.isLive ? 'text-emerald-400' : 'text-slate-500' },
+                { label: 'Compiler', value: 'Compact v0.16', color: 'text-indigo-300' },
+                { label: 'Proofs', value: 'Off-Chain Witness', color: 'text-purple-300' },
               ].map((row) => (
                 <div key={row.label} className="flex items-center justify-between gap-8">
                   <span className="text-xs text-slate-500 font-mono">{row.label}</span>
@@ -372,45 +292,43 @@ export const RevenueSplit: React.FC = () => {
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          Statistics grid
-      ══════════════════════════════════════════════════════════════════════ */}
+      {/* Statistics grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
         {[
           {
-            label:    'Total Paid In',
-            value:    poolState.totalPaidIn.toString(),
-            unit:     'tDUST',
-            sub:      'Public balance · on-chain',
-            icon:     <Coins      className="w-5 h-5" />,
-            iconCls:  'bg-indigo-500/10  text-indigo-400',
+            label: 'Total Paid In',
+            value: poolState.totalPaidIn.toString(),
+            unit: 'tDUST',
+            sub: 'Public balance · on-chain',
+            icon: <Coins className="w-5 h-5" />,
+            iconCls: 'bg-indigo-500/10  text-indigo-400',
             hoverCls: 'hover:border-indigo-500/30',
           },
           {
-            label:    'Total Split Out',
-            value:    poolState.totalSplitOut.toString(),
-            unit:     'tDUST',
-            sub:      'ZK verified · cumulative',
-            icon:     <Layers     className="w-5 h-5" />,
-            iconCls:  'bg-purple-500/10  text-purple-400',
+            label: 'Total Split Out',
+            value: poolState.totalSplitOut.toString(),
+            unit: 'tDUST',
+            sub: 'ZK verified · cumulative',
+            icon: <Layers className="w-5 h-5" />,
+            iconCls: 'bg-purple-500/10  text-purple-400',
             hoverCls: 'hover:border-purple-500/30',
           },
           {
-            label:    'Commitments',
-            value:    String(poolState.recipientCommitmentCount),
-            unit:     'parties',
-            sub:      'Individual cuts concealed',
-            icon:     <Lock       className="w-5 h-5" />,
-            iconCls:  'bg-cyan-500/10    text-cyan-400',
+            label: 'Commitments',
+            value: String(poolState.recipientCommitmentCount),
+            unit: 'parties',
+            sub: 'Individual cuts concealed',
+            icon: <Lock className="w-5 h-5" />,
+            iconCls: 'bg-cyan-500/10    text-cyan-400',
             hoverCls: 'hover:border-cyan-500/30',
           },
           {
-            label:    'Claims Executed',
-            value:    poolState.claimCount.toString(),
-            unit:     'nullifiers',
-            sub:      'No double-claim possible',
-            icon:     <UserCheck  className="w-5 h-5" />,
-            iconCls:  'bg-emerald-500/10 text-emerald-400',
+            label: 'Claims Executed',
+            value: poolState.claimCount.toString(),
+            unit: 'nullifiers',
+            sub: 'No double-claim possible',
+            icon: <UserCheck className="w-5 h-5" />,
+            iconCls: 'bg-emerald-500/10 text-emerald-400',
             hoverCls: 'hover:border-emerald-500/30',
           },
         ].map((card) => (
@@ -426,7 +344,7 @@ export const RevenueSplit: React.FC = () => {
             </div>
             <div>
               <p className="text-[32px] font-bold font-mono text-white leading-none tracking-tight">
-                {card.value}
+                {isLoading ? '…' : card.value}
               </p>
               <p className="text-xs text-slate-500 mt-1">{card.unit}</p>
             </div>
@@ -437,12 +355,8 @@ export const RevenueSplit: React.FC = () => {
         ))}
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          Main panel
-      ══════════════════════════════════════════════════════════════════════ */}
+      {/* Main panel */}
       <div className="card overflow-hidden">
-
-        {/* ── Tab bar ─────────────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4
                         border-b border-white/[0.05] px-6 sm:px-8 py-5">
           <div className="tabs-scroll flex items-center gap-1.5">
@@ -464,27 +378,24 @@ export const RevenueSplit: React.FC = () => {
           </div>
 
           <button
-            onClick={refreshState}
+            onClick={() => refresh()}
+            disabled={isFetching}
             title="Sync ledger state"
             className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-slate-400
                        hover:text-indigo-300 hover:bg-white/[0.04] border border-white/[0.05]
-                       text-sm font-mono transition-colors shrink-0 self-end sm:self-auto"
+                       text-sm font-mono transition-colors shrink-0 self-end sm:self-auto
+                       disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
             Sync State
           </button>
         </div>
 
-        {/* ── Tab content ─────────────────────────────────────────────────── */}
         <div className="px-6 sm:px-10 py-8 sm:py-10">
 
-          {/* ────────────────────────────────────────────────────────────────
-              TAB: Claim Private Cut
-          ──────────────────────────────────────────────────────────────── */}
+          {/* TAB: Claim Private Cut */}
           {activeTab === 'claim' && (
             <div className="space-y-8">
-
-              {/* Section header */}
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div className="space-y-2">
                   <h2 className="text-xl font-semibold text-white flex items-center gap-2.5">
@@ -502,7 +413,6 @@ export const RevenueSplit: React.FC = () => {
                 </Badge>
               </div>
 
-              {/* Demo credentials panel */}
               <div className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-5 py-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-2.5 text-sm text-slate-400">
@@ -541,10 +451,8 @@ export const RevenueSplit: React.FC = () => {
                 </div>
               </div>
 
-              {/* Claim form */}
               <form onSubmit={handleClaim} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Secret */}
                   <Field
                     id="claim-secret"
                     label="Recipient Private Secret Key"
@@ -572,7 +480,6 @@ export const RevenueSplit: React.FC = () => {
                     </div>
                   </Field>
 
-                  {/* Salt */}
                   <Field
                     id="claim-salt"
                     label="Recipient Salt"
@@ -590,7 +497,6 @@ export const RevenueSplit: React.FC = () => {
                   </Field>
                 </div>
 
-                {/* Amount */}
                 <Field
                   id="claim-amount"
                   label={<>Claim Payout Amount <span className="text-slate-500 font-normal">(tDUST)</span></>}
@@ -607,7 +513,6 @@ export const RevenueSplit: React.FC = () => {
                   />
                 </Field>
 
-                {/* Primary CTA */}
                 <div className="pt-2">
                   <button
                     type="submit"
@@ -634,7 +539,6 @@ export const RevenueSplit: React.FC = () => {
                 </div>
               </form>
 
-              {/* Error */}
               {claimError && (
                 <div className="flex items-start gap-4 p-5 rounded-xl
                                 bg-red-500/6 border border-red-500/20">
@@ -646,10 +550,8 @@ export const RevenueSplit: React.FC = () => {
                 </div>
               )}
 
-              {/* Success receipt */}
               {claimSuccess && (
                 <div className="rounded-xl border border-emerald-500/25 bg-emerald-950/12 overflow-hidden">
-                  {/* Header */}
                   <div className="flex flex-wrap items-center justify-between gap-3
                                   px-6 py-4 border-b border-emerald-500/15 bg-emerald-950/10">
                     <div className="flex items-center gap-3 text-emerald-400 font-semibold text-[15px]">
@@ -659,7 +561,6 @@ export const RevenueSplit: React.FC = () => {
                     <Badge variant="emerald">On-Chain Confirmed</Badge>
                   </div>
 
-                  {/* Body */}
                   <div className="px-6 py-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-1.5">
                       <p className="text-xs font-medium text-slate-500 uppercase tracking-widest">
@@ -683,6 +584,27 @@ export const RevenueSplit: React.FC = () => {
 
                     <div className="sm:col-span-2 space-y-2">
                       <p className="text-xs font-medium text-slate-500 uppercase tracking-widest">
+                        Transaction ID
+                      </p>
+                      <div className="flex items-center gap-3 px-4 py-3 rounded-lg
+                                      bg-[#07091a]/80 border border-white/[0.06]">
+                        <span className="flex-1 truncate text-[13px] text-slate-400 font-mono">
+                          {claimSuccess.txId}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(claimSuccess.txId)}
+                          title="Copy transaction ID"
+                          className="p-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08]
+                                     text-slate-500 hover:text-slate-200 transition-colors shrink-0"
+                        >
+                          {copiedNullifier ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2 space-y-2">
+                      <p className="text-xs font-medium text-slate-500 uppercase tracking-widest">
                         Cryptographic Nullifier (disclosed)
                       </p>
                       <div className="flex items-center gap-3 px-4 py-3 rounded-lg
@@ -697,9 +619,7 @@ export const RevenueSplit: React.FC = () => {
                           className="p-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08]
                                      text-slate-500 hover:text-slate-200 transition-colors shrink-0"
                         >
-                          {copiedNullifier
-                            ? <Check className="w-4 h-4 text-emerald-400" />
-                            : <Copy  className="w-4 h-4" />}
+                          <Copy className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -709,9 +629,7 @@ export const RevenueSplit: React.FC = () => {
             </div>
           )}
 
-          {/* ────────────────────────────────────────────────────────────────
-              TAB: Register Split
-          ──────────────────────────────────────────────────────────────── */}
+          {/* TAB: Register Split */}
           {activeTab === 'register' && (
             <div className="space-y-8">
               <div className="space-y-2">
@@ -720,7 +638,7 @@ export const RevenueSplit: React.FC = () => {
                   Register Recipient Commitment
                 </h2>
                 <p className="text-[14px] text-slate-400 leading-relaxed max-w-xl">
-                  As deal organiser, register a recipient's commitment on-chain. The individual
+                  As deal organizer, register a recipient's commitment on-chain. The individual
                   cut is converted to a cryptographic hash — no observer can see the share percentage.
                 </p>
               </div>
@@ -796,9 +714,7 @@ export const RevenueSplit: React.FC = () => {
             </div>
           )}
 
-          {/* ────────────────────────────────────────────────────────────────
-              TAB: Privacy Model
-          ──────────────────────────────────────────────────────────────── */}
+          {/* TAB: Privacy Model */}
           {activeTab === 'overview' && (
             <div className="space-y-8">
               <div className="space-y-2">
@@ -812,7 +728,6 @@ export const RevenueSplit: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Public */}
                 <div className="rounded-xl border border-emerald-500/20 bg-[#07091a]/50 overflow-hidden">
                   <div className="flex items-center justify-between px-5 py-4
                                   border-b border-emerald-500/12 bg-emerald-950/8">
@@ -823,23 +738,19 @@ export const RevenueSplit: React.FC = () => {
                   </div>
                   <ul className="divide-y divide-white/[0.04] text-sm font-mono">
                     {[
-                      { key: 'totalPaidIn',        val: `${poolState.totalPaidIn.toString()} tDUST`,  color: 'text-emerald-400' },
-                      { key: 'totalSplitOut',       val: `${poolState.totalSplitOut.toString()} tDUST`, color: 'text-emerald-400' },
-                      { key: 'splitCommitment',     val: poolState.splitCommitment,                    color: 'text-slate-400',   truncate: true },
-                      { key: 'claimedNullifiers',   val: `${poolState.claimedNullifierCount} spent`,   color: 'text-purple-400' },
+                      { key: 'totalPaidIn', val: `${poolState.totalPaidIn.toString()} tDUST`, color: 'text-emerald-400' },
+                      { key: 'totalSplitOut', val: `${poolState.totalSplitOut.toString()} tDUST`, color: 'text-emerald-400' },
+                      { key: 'commitments', val: `${poolState.recipientCommitmentCount} parties`, color: 'text-cyan-400' },
+                      { key: 'claimedNullifiers', val: `${poolState.claimedNullifierCount} spent`, color: 'text-purple-400' },
                     ].map((row) => (
-                      <li key={row.key}
-                          className="flex items-center justify-between px-5 py-3.5 gap-6">
+                      <li key={row.key} className="flex items-center justify-between px-5 py-3.5 gap-6">
                         <span className="text-slate-500">{row.key}</span>
-                        <span className={`${row.color} font-semibold ${row.truncate ? 'truncate max-w-[140px]' : ''}`}>
-                          {row.val}
-                        </span>
+                        <span className={`${row.color} font-semibold`}>{row.val}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Private */}
                 <div className="rounded-xl border border-purple-500/20 bg-[#07091a]/50 overflow-hidden">
                   <div className="flex items-center justify-between px-5 py-4
                                   border-b border-purple-500/12 bg-purple-950/8">
@@ -850,13 +761,12 @@ export const RevenueSplit: React.FC = () => {
                   </div>
                   <ul className="divide-y divide-white/[0.04] text-sm font-mono">
                     {[
-                      { key: 'recipientSecret', val: 'NEVER ON-CHAIN',      color: 'text-purple-400' },
-                      { key: 'recipientSalt',   val: 'OFF-CHAIN BLINDING',   color: 'text-purple-400' },
-                      { key: 'individualCut',   val: 'HIDDEN FROM OTHERS',   color: 'text-purple-400' },
-                      { key: 'ZK Constraint',   val: 'sum(cuts) ≤ totalPaidIn', color: 'text-emerald-400' },
+                      { key: 'recipientSecret', val: 'NEVER ON-CHAIN', color: 'text-purple-400' },
+                      { key: 'recipientSalt', val: 'OFF-CHAIN BLINDING', color: 'text-purple-400' },
+                      { key: 'individualCut', val: 'HIDDEN FROM OTHERS', color: 'text-purple-400' },
+                      { key: 'ZK Constraint', val: 'sum(cuts) ≤ totalPaidIn', color: 'text-emerald-400' },
                     ].map((row) => (
-                      <li key={row.key}
-                          className="flex items-center justify-between px-5 py-3.5 gap-6">
+                      <li key={row.key} className="flex items-center justify-between px-5 py-3.5 gap-6">
                         <span className="text-slate-500">{row.key}</span>
                         <span className={`${row.color} font-semibold`}>{row.val}</span>
                       </li>
@@ -867,9 +777,7 @@ export const RevenueSplit: React.FC = () => {
             </div>
           )}
 
-          {/* ────────────────────────────────────────────────────────────────
-              TAB: Proof Logs
-          ──────────────────────────────────────────────────────────────── */}
+          {/* TAB: Proof Logs */}
           {activeTab === 'logs' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -888,8 +796,8 @@ export const RevenueSplit: React.FC = () => {
                     <span className="text-slate-600 text-xs shrink-0 pt-px">{log.timestamp}</span>
                     <span className={`leading-relaxed ${
                       log.type === 'success' ? 'text-emerald-400'
-                    : log.type === 'zk'      ? 'text-purple-300'
-                    :                          'text-slate-400'
+                    : log.type === 'zk' ? 'text-purple-300'
+                    : 'text-slate-400'
                     }`}>
                       {log.message}
                     </span>
@@ -899,8 +807,8 @@ export const RevenueSplit: React.FC = () => {
             </div>
           )}
 
-        </div>{/* end tab content */}
-      </div>{/* end main panel */}
+        </div>
+      </div>
 
     </div>
   );
