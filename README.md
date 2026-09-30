@@ -6,7 +6,7 @@
 [![Midnight Network](https://img.shields.io/badge/Network-Midnight%20Preprod-blueviolet.svg)](https://midnight.network/)
 
 **📍 Deployed Contract Address (Midnight Preprod):**  
-`02005a9c0897f1da76135dd6977be415f3cf374466986b24d77eb60cbe4eeef45a8e`
+`0xdd549ae8216a1a2a22b85e84e69d1f8a3a7396e45c9cd2af543d673b41e05214`
 
 Privacy-preserving revenue distribution powered by Midnight Network, Compact smart contracts, zero-knowledge proofs, and 1AM Wallet.
 
@@ -76,7 +76,7 @@ Private Revenue Split is a Midnight Preprod decentralized application that allow
 
 | Network | Contract Address |
 |---|---|
-| Midnight Preprod | ⏳ Pending deployment — contract will be deployed to Preprod in step 2 |
+| Midnight Preprod | `0xdd549ae8216a1a2a22b85e84e69d1f8a3a7396e45c9cd2af543d673b41e05214` |
 
 The contract source is defined in `contracts/revenue-split.compact` and implements the privacy-preserving revenue split logic used by the application.
 

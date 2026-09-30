@@ -25,7 +25,7 @@ export const NETWORK_ID = 'preprod' as const;
  */
 export const CONTRACT_ADDRESS: string =
   (import.meta as any).env?.VITE_CONTRACT_ADDRESS ??
-  '02005a9c0897f1da76135dd6977be415f3cf374466986b24d77eb60cbe4eeef45a8e';
+  '0xdd549ae8216a1a2a22b85e84e69d1f8a3a7396e45c9cd2af543d673b41e05214';
 
 // ── Midnight Preprod public endpoints ────────────────────────────────────────
 
