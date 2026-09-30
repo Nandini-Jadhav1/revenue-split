@@ -1,5 +1,4 @@
-
----
+# 🔐 Private Revenue Split
 
 ## 🔒 Privacy Model
 
@@ -86,7 +85,7 @@ Four-job GitHub Actions workflow on every push and PR to `main`:
 | CI/CD pipeline on product repo | ✅ `.github/workflows/ci.yml` |
 | Product X profile | ✅ [@jadhav_nan99910](https://x.com/jadhav_nan99910) |
 | Minimum 15 meaningful commits | ✅ See commit history |
-| Preprod contract address |  ✅ 0xb1eb2448c2164288361542720e1b8a822a28c5f05bd1a1456fb24fa293536a65|
+| Preprod contract address | ✅ 0xb1eb2448c2164288361542720e1b8a822a28c5f05bd1a1456fb24fa293536a65 |
 | Demo video | ✅ [Watch here](https://youtu.be/yyFmQHbjRrc) |
 
 ---
