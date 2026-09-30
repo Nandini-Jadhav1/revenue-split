@@ -9,6 +9,7 @@
     "compile": "compact compile contracts/revenue-split.compact ./contracts/managed/RevenueSplit",
     "build": "tsc && vite build",
     "deploy": "npx tsx scripts/deploy-contract.ts",
+    "verify-contract": "npx tsx scripts/verify-contract.ts",
     "fetch-users": "npx tsx scripts/fetch-preprod-users.ts",
     "test": "npx vitest run",
     "test:watch": "npx vitest",
