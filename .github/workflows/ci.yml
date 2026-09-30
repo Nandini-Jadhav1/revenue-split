@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  NODE_VERSION: '24.x'
+  NODE_VERSION: '22.x'
 
 jobs:
   # ─────────────────────────────────────────
@@ -30,11 +30,32 @@ jobs:
         run: npm ci
 
       - name: Run TypeScript Type Check
-        # Managed contract artifacts are committed — no Compact compiler needed in CI
         run: npx tsc --noEmit
 
   # ─────────────────────────────────────────
-  # Job 2: Unit Tests
+  # Job 2: Verify Contract Address
+  # ─────────────────────────────────────────
+  verify-contract:
+    name: Verify Deployed Contract Address
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check .contract-address exists
+        run: |
+          if [ ! -f .contract-address ]; then
+            echo "❌ .contract-address file not found"
+            exit 1
+          fi
+          CONTRACT_ADDR=$(cat .contract-address)
+          echo "✅ Contract address found: $CONTRACT_ADDR"
+          if [ ${#CONTRACT_ADDR} -ne 66 ]; then
+            echo "⚠️  Warning: Expected 66-character hex address"
+          fi
+
+  # ─────────────────────────────────────────
+  # Job 3: Unit Tests
   # ─────────────────────────────────────────
   test:
     name: Unit Tests (Vitest)
@@ -57,7 +78,7 @@ jobs:
         run: npm test
 
   # ─────────────────────────────────────────
-  # Job 3: Production Build
+  # Job 4: Production Build
   # ─────────────────────────────────────────
   build:
     name: Production Build & Artifact Upload
@@ -87,7 +108,7 @@ jobs:
           retention-days: 7
 
   # ─────────────────────────────────────────
-  # Job 4: Security Audit
+  # Job 5: Security Audit
   # ─────────────────────────────────────────
   audit:
     name: Dependency Security Audit
