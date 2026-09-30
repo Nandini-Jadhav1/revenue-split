@@ -5,6 +5,9 @@
 [![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-green.svg)](https://nodejs.org/)
 [![Midnight Network](https://img.shields.io/badge/Network-Midnight%20Preprod-blueviolet.svg)](https://midnight.network/)
 
+**📍 Deployed Contract Address (Midnight Preprod):**  
+`02005a9c0897f1da76135dd6977be415f3cf374466986b24d77eb60cbe4eeef45a8e`
+
 Privacy-preserving revenue distribution powered by Midnight Network, Compact smart contracts, zero-knowledge proofs, and 1AM Wallet.
 
 Private Revenue Split is a Midnight Preprod decentralized application that allows a revenue pool to be distributed among multiple recipients while keeping individual recipient payout values confidential. The application combines a Midnight Compact smart contract, zero-knowledge proof verification, private witnesses, commitment-based recipient registration, and 1AM Wallet transaction authorization.
@@ -61,7 +64,7 @@ Private Revenue Split is a Midnight Preprod decentralized application that allow
 | GitHub Repository | https://github.com/Nandini-Jadhav1/revenue-split |
 | Live Production Demo | https://revenue-split-nu.vercel.app |
 | Demo Video | https://youtu.be/yyFmQHbjRrc |
-| X / Project Profile | https://x.com/jadhav_nan99910 |
+| X / Twitter Profile | [@jadhav_nan99910](https://x.com/jadhav_nan99910) |
 | Google Feedback Form | https://docs.google.com/forms/d/1rhrEcQg1HiFBwoY59cFKXp5K8nU4WeMpskPLNH6Edrk/viewform |
 | Google Feedback Responses | https://docs.google.com/spreadsheets/d/1vW6SEV52-JAy9A4Y3DYNu8F8dijMZnh64fwbAbs9s/edit?gid=2082627229 |
 | Feedback Documentation | docs/FEEDBACK.md |
